@@ -92,7 +92,7 @@ class protobuf_fetch_t(idaapi.plugin_t):
             addon.name = "Protobuf Finder"
             addon.producer = "Accenture"
             addon.url = "https://github.com/Accenture/protobuf-finder"
-            addon.version = "9.2.0.0"
+            addon.version = "1.0.0.1"
             idaapi.register_addon(addon)
 
         return idaapi.PLUGIN_KEEP
