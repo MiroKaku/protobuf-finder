@@ -142,15 +142,15 @@ def decode_varint128(stream):
     '''
     Decode Varint128 from buffer
     '''
-    bits = ''
+    value = 0
     count = 0
     for stream_byte in stream:
-        count += 1
         raw_byte = stream_byte
-        bits += (bin((raw_byte&0x7F))[2:]).rjust(7,'0')
+        value |= (raw_byte&0x7F) << (7*count)
+        count += 1
         if (raw_byte&0x80) != 0x80:
             break
-    return (int(bits, 2), count)
+    return (value, count)
 
 
 def render_type(field_type, package):
@@ -339,11 +339,11 @@ class ProtobufExtractor:
     def extract(self):
         protos = []
         searchStartAddr = 0
+        pattern = ida_bytes.compiled_binpat_vec_t()
+        ida_bytes.parse_binpat_str(pattern,0x0,'2E 70 72 6F 74 6F',16,ida_nalt.BPU_2B)
         
         while True:
             # search binary for ".proto" string
-            pattern = ida_bytes.compiled_binpat_vec_t()
-            ida_bytes.parse_binpat_str(pattern,0x0,'2E 70 72 6F 74 6F',16,ida_nalt.BPU_2B)
             r,_ = ida_bytes.bin_search(searchStartAddr,ida_ida.MAXADDR,pattern,1)
             if r == idaapi.BADADDR:
                 print("[Protobuf][dbg] Search results into BADADDR (not found). Break!")
